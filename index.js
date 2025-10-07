@@ -13,7 +13,7 @@ app.get('/api/films', (request, response) => {
   })
 })
 
-app.get('/api/films/:id', (request, response) => {
+app.get('/api/films/:id', (request, response, next) => {
   Film.findById(request.params.id)
     .then(film => {
       if (film) {
@@ -25,7 +25,7 @@ app.get('/api/films/:id', (request, response) => {
     .catch(error => next(error))
 })
 
-app.post('/api/films', (request, response) => {
+app.post('/api/films', (request, response, next) => {
   const body = request.body
   if (!body.title) {
     return response.status(400).json({
@@ -40,9 +40,10 @@ app.post('/api/films', (request, response) => {
   film.save().then(savedFilm => {
     response.json(savedFilm)
   })
+  .catch(error => next(error))
 })
 
-app.delete('/api/films/:id', (request, response) => {
+app.delete('/api/films/:id', (request, response, next) => {
   Film.findByIdAndDelete(request.params.id)
     .then(result => {
       response.status(204).end()
@@ -68,7 +69,7 @@ app.put('/api/films/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-const undknownEndpoint = (request, response) => {
+const undknownEndpoint = (request, response, next) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
