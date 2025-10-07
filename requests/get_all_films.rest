@@ -4,5 +4,5 @@ POST http://localhost:3001/api/films
 content-type: application/json
 
 {
-  "title": "28 Years Later"
+  "title": "Django Unchained"
 }

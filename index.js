@@ -1,33 +1,16 @@
+require('dotenv').config()
 const express = require("express");
+const Film = require('./models/film')
+
 const app = express();
-
-const PORT = process.env.PORT || 3001;
-
-
-let films = [
-  {
-    "id": "1",
-    "title": "Pulp Fiction"
-  },
-  {
-    "id": "2",
-    "title": "There Will Be Blood"
-  },
-  {
-    "id": "8682",
-    "title": "Inglorius Basterds"
-  }
-]
 
 app.use(express.json())
 app.use(express.static('dist'))
 
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World</h1>')
-})
-
 app.get('/api/films', (request, response) => {
-  response.json(films)
+  Film.find({}).then(films => {
+    response.json(films)
+  })
 })
 
 app.get('/api/films/:id', (request, response) => {
@@ -40,11 +23,11 @@ app.get('/api/films/:id', (request, response) => {
   }
 })
 
-const generateId = () => {
-  const maxId =
-    films.length > 0 ? Math.max(...films.map((n) => Number(n.id))) : 0
-  return String(maxId + 1)
-}
+// const generateId = () => {
+//   const maxId =
+//     films.length > 0 ? Math.max(...films.map((n) => Number(n.id))) : 0
+//   return String(maxId + 1)
+// }
 
 app.post('/api/films', (request, response) => {
   const body = request.body
@@ -54,24 +37,22 @@ app.post('/api/films', (request, response) => {
     })
   }
 
-  const film = {
-    title: body.title,
-    id: generateId()
-  }
+  const film = new Film({
+    title: body.title
+  })
 
-  films = films.concat(film)
-
-  response.json(film)
-
+  film.save().then(savedFilm => {
+    response.json(savedFilm)
+  })
 })
 
 app.delete('/api/films/:id', (request, response) => {
-  const id = request.params.id
-  films = films.filter(film => film.id === id)
-
-  response.status(204).end()
+  Film.findById(request.params.id).then(film => {
+    response.json(film)
+  })
 })
 
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
