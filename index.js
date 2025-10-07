@@ -14,20 +14,16 @@ app.get('/api/films', (request, response) => {
 })
 
 app.get('/api/films/:id', (request, response) => {
-  const id = request.params.id
-  const film = films.find(film => film.id === id)
-  if (film) {
-    response.json(film)
-  } else {
-    response.status(404).end()
-  }
+  Film.findById(request.params.id)
+    .then(film => {
+      if (film) {
+        response.json(film)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
-
-// const generateId = () => {
-//   const maxId =
-//     films.length > 0 ? Math.max(...films.map((n) => Number(n.id))) : 0
-//   return String(maxId + 1)
-// }
 
 app.post('/api/films', (request, response) => {
   const body = request.body
@@ -47,10 +43,46 @@ app.post('/api/films', (request, response) => {
 })
 
 app.delete('/api/films/:id', (request, response) => {
-  Film.findById(request.params.id).then(film => {
-    response.json(film)
-  })
+  Film.findByIdAndDelete(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 })
+
+app.put('/api/films/:id', (request, response, next) => {
+  const { title } = request.body
+
+  Film.findById(request.params.id)
+    .then(film => {
+      if(!film) {
+        return response.status(404).end()
+      }
+
+      film.title = title
+
+      return film.save().then((updatedFilm) => {
+        response.json(updatedFilm)
+      })
+    })
+    .catch(error => next(error))
+})
+
+const undknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

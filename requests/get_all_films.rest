@@ -6,3 +6,12 @@ content-type: application/json
 {
   "title": "Django Unchained"
 }
+###
+DELETE http://localhost:3001/api/films/68e5681c89d429ed15fc0b30
+###
+PUT http://localhost:3001/api/films/68e567cf89d429ed15fc0b2b
+Content-Type: application/json
+
+{
+  "title": "Django (Unchained)"
+}
