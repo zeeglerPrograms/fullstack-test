@@ -1,8 +1,8 @@
 require('dotenv').config()
-const express = require("express");
+const express = require('express')
 const Film = require('./models/film')
 
-const app = express();
+const app = express()
 
 app.use(express.json())
 app.use(express.static('dist'))
@@ -37,15 +37,16 @@ app.post('/api/films', (request, response, next) => {
     title: body.title
   })
 
-  film.save().then(savedFilm => {
-    response.json(savedFilm)
-  })
-  .catch(error => next(error))
+  film.save()
+    .then(savedFilm => {
+      response.json(savedFilm)
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/films/:id', (request, response, next) => {
   Film.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -69,10 +70,6 @@ app.put('/api/films/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-const undknownEndpoint = (request, response, next) => {
-  response.status(404).send({ error: 'unknown endpoint' })
-}
-
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
@@ -85,7 +82,7 @@ const errorHandler = (error, request, response, next) => {
 
 app.use(errorHandler)
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT
 app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-});
+  console.log(`Server listening on ${PORT}`)
+})
